@@ -1,4 +1,5 @@
 package BTO_System;
+
 class Applicant extends User {
     private Application application;
 
