@@ -53,18 +53,13 @@ public class HDBOfficer extends Applicant {
             return null;
         }
         Receipt receipt = new Receipt(
-                application.getApplicant().getNric(), // NRIC
+                application.getApplicant().getNric(),
                 application.getApplicant().getAge(),
                 application.getApplicant().getMaritalStatus(),
                 application.getFlatTypeChosen(),
                 application.getProject().getProjectName(),
                 new Date()
         );
-        System.out.println("Receipt generated for " + application.getApplicant().getNric());
-        return receipt;
-    }
-    
-        
         System.out.println("Receipt generated for " + application.getApplicant().getNric());
         return receipt;
     }
