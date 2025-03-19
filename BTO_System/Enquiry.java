@@ -1,7 +1,7 @@
 package BTO_System;
 
 public class Enquiry {
-    private static int idCounter = 1; // For auto-generating enquiry IDs
+    private static int idCounter = 1;
     private int enquiryID;
     private String content;
     private User submittedBy;
@@ -13,10 +13,9 @@ public class Enquiry {
         this.content = content;
         this.submittedBy = submittedBy;
         this.relatedProject = relatedProject;
-        this.reply = null; // No reply yet when enquiry is submitted
+        this.reply = null;
     }
 
-    // Getters and Setters
     public int getEnquiryID() {
         return enquiryID;
     }
@@ -45,7 +44,6 @@ public class Enquiry {
         this.reply = reply;
     }
 
-    // Display Enquiry Details
     public void displayEnquiry() {
         System.out.println("Enquiry ID: " + enquiryID);
         System.out.println("Submitted By: " + submittedBy.getNric());
@@ -58,4 +56,3 @@ public class Enquiry {
         }
     }
 }
-

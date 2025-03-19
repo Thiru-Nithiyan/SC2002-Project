@@ -1,10 +1,6 @@
 package BTO_System;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Project {
     private String projectName;
@@ -20,7 +16,6 @@ public class Project {
     private HDBManager managerInCharge;
     private List<Enquiry> enquiries;
 
-    // Constructor
     public Project(String projectName, String neighborhood, List<FlatType> flatTypes, 
                    Map<FlatType, Integer> unitsAvailable, Date openingDate, 
                    Date closingDate, HDBManager managerInCharge) {
@@ -30,15 +25,14 @@ public class Project {
         this.unitsAvailable = new HashMap<>(unitsAvailable);
         this.openingDate = openingDate;
         this.closingDate = closingDate;
-        this.visibility = true; // Default visible
-        this.officerSlots = 10; // Max 10 officers
+        this.visibility = true;
+        this.officerSlots = 10;
         this.applicantsList = new ArrayList<>();
         this.officersList = new ArrayList<>();
         this.managerInCharge = managerInCharge;
         this.enquiries = new ArrayList<>();
     }
 
-    // Getters & Setters
     public String getProjectName() {
         return projectName;
     }
@@ -91,7 +85,6 @@ public class Project {
         return enquiries;
     }
 
-    // Methods
     public void addApplicant(Applicant applicant) {
         applicantsList.add(applicant);
     }
@@ -116,19 +109,6 @@ public class Project {
         }
     }
 
-    public static List<Project> filterProjectList(List<Project> projects, String neighborhoodFilter, FlatType flatTypeFilter) {
-        List<Project> filtered = new ArrayList<>();
-        for (Project project : projects) {
-            boolean matchesNeighborhood = (neighborhoodFilter == null || project.getNeighborhood().equalsIgnoreCase(neighborhoodFilter));
-            boolean matchesFlatType = (flatTypeFilter == null || project.getFlatTypes().contains(flatTypeFilter));
-            if (matchesNeighborhood && matchesFlatType) {
-                filtered.add(project);
-            }
-        }
-        return filtered;
-    }
-
-    // Display project details
     public void displayProjectDetails() {
         System.out.println("Project Name: " + projectName);
         System.out.println("Neighborhood: " + neighborhood);

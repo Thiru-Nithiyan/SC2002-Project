@@ -1,4 +1,6 @@
 package BTO_System;
+import java.util.List;
+
 enum ApplicationStatus {
     PENDING,
     SUCCESSFUL,
@@ -40,7 +42,7 @@ class User {
     public void viewProjects(List<Project> projects) {
         for (Project project : projects) {
             if (project.isVisible()) {
-                System.out.println(project);
+                project.displayProjectDetails();
             }
         }
     }
@@ -51,7 +53,7 @@ class User {
 
     public void editEnquiry(int enquiryID, String newContent, List<Enquiry> enquiries) {
         for (Enquiry enquiry : enquiries) {
-            if (enquiry.getId() == enquiryID) {
+            if (enquiry.getEnquiryID() == enquiryID) {
                 enquiry.setContent(newContent);
                 break;
             }
@@ -59,16 +61,15 @@ class User {
     }
 
     public void deleteEnquiry(int enquiryID, List<Enquiry> enquiries) {
-        enquiries.removeIf(enquiry -> enquiry.getId() == enquiryID);
+        enquiries.removeIf(enquiry -> enquiry.getEnquiryID() == enquiryID);
     }
 
     public void viewEnquiries(List<Enquiry> enquiries) {
         for (Enquiry enquiry : enquiries) {
-            System.out.println(enquiry);
+            enquiry.displayEnquiry();
         }
     }
 
-    // Getters and Setters
     public String getNric() {
         return nric;
     }

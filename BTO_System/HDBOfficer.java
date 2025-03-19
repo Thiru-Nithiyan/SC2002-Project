@@ -1,8 +1,6 @@
 package BTO_System;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class HDBOfficer extends Applicant {
     private List<Project> registeredProjects;
@@ -27,13 +25,7 @@ public class HDBOfficer extends Applicant {
     }
 
     public void viewProjectDetails(Project project) {
-        System.out.println("Project Details: ");
-        System.out.println("Name: " + project.getProjectName());
-        System.out.println("Neighborhood: " + project.getNeighborhood());
-        System.out.println("Flat Types: " + project.getFlatTypes());
-        System.out.println("Units Available: " + project.getUnitsAvailable());
-        System.out.println("Officer Slots Remaining: " + project.getOfficerSlots());
-        System.out.println("Visibility: " + (project.isVisible() ? "Visible" : "Hidden"));
+        project.displayProjectDetails();
     }
 
     public void updateFlatAvailability(Project project, FlatType flatType, int count) {
@@ -61,13 +53,18 @@ public class HDBOfficer extends Applicant {
             return null;
         }
         Receipt receipt = new Receipt(
-                application.getApplicant().getNric(),
+                application.getApplicant().getNric(), // NRIC
                 application.getApplicant().getAge(),
                 application.getApplicant().getMaritalStatus(),
                 application.getFlatTypeChosen(),
                 application.getProject().getProjectName(),
                 new Date()
         );
+        System.out.println("Receipt generated for " + application.getApplicant().getNric());
+        return receipt;
+    }
+    
+        
         System.out.println("Receipt generated for " + application.getApplicant().getNric());
         return receipt;
     }

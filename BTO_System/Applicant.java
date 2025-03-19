@@ -5,6 +5,7 @@ class Applicant extends User {
 
     public Applicant(String nric, String password, int age, MaritalStatus maritalStatus) {
         super(nric, password, age, maritalStatus);
+        this.application = null;
     }
 
     public void applyForProject(Project project, FlatType flatType) {
@@ -31,5 +32,13 @@ class Applicant extends User {
         } else {
             System.out.println("No application found.");
         }
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 }
