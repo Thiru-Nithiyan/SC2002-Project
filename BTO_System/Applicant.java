@@ -20,7 +20,7 @@ class Applicant extends User {
     public void withdrawApplication() {
         if (application != null) {
             application.updateStatus(ApplicationStatus.UNSUCCESSFUL);
-            System.out.println("Application withdrawn.");
+            System.out.println("Application withdrawn!");
         } else {
             System.out.println("No application to withdraw.");
         }
