@@ -5,7 +5,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         // Manager creation
-        HDBManager manager = new HDBManager("M1234567A", "password", 45, MaritalStatus.MARRIED);
+        HDBManager manager = new HDBManager("M1234567A", "Password", 45, MaritalStatus.MARRIED);
 
         // Flat type and unit availability setup
         List<FlatType> flatTypes = new ArrayList<>();
