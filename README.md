@@ -61,7 +61,7 @@ class HDBManager extends User {
 | - managerInCharge: HDBManager                          |
 | - enquiries: List<Enquiry>                             |
 +--------------------------------------------------------+
-| + Project(...)                                         |
+| + Project( need add  arguments )                       |
 | + getProjectName(): String                             |
 | + getNeighborhood(): String                            |
 | + getFlatTypes(): List<FlatType>                       |
