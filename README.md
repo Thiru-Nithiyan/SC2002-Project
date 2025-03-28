@@ -1,49 +1,84 @@
 @startuml
 
 ' Abstract User class
-abstract class User {
-  - nric: String
-  - password: String
-  - age: int
-  - maritalStatus: MaritalStatus
-  + login(): void
-  + changePassword(newPassword: String): void
-  + viewProjects(): void
-  + submitEnquiry(enquiry: Enquiry): void
-  + editEnquiry(enquiryID: int): void
-  + deleteEnquiry(enquiryID: int): void
-  + viewEnquiries(): void
-}
++----------------------------------------------+
+|                    User                      |
++----------------------------------------------+
+| - nric: String                               |
+| - password: String                           |
+| - age: int                                   |
+| - maritalStatus: MaritalStatus               |
++----------------------------------------------+
+| + User(nric: String, password: String,       |
+|        age: int, maritalStatus: MaritalStatus)|
+| + login(nric: String, password: String): boolean |
+| + changePassword(newPassword: String): void  |
+| + viewProjects(projects: List<Project>): void|
+| + submitEnquiry(enquiry: Enquiry,            |
+|                 enquiries: List<Enquiry>): void |
+| + editEnquiry(enquiryID: int, newContent:    |
+|               String, enquiries: List<Enquiry>): void |
+| + deleteEnquiry(enquiryID: int,              |
+|                 enquiries: List<Enquiry>): void |
+| + viewEnquiries(enquiries: List<Enquiry>): void |
+| + getNric(): String                          |
+| + getAge(): int                              |
+| + getMaritalStatus(): MaritalStatus          |
++----------------------------------------------+
 
-class Applicant extends User {
-  - application: Application
-  + applyForProject(project: Project): void
-  + withdrawApplication(): void
-  + viewApplicationStatus(): void
-}
++------------------------------------------+
+|                Applicant                 |
++------------------------------------------+
+| - application: Application               |
++------------------------------------------+
+| + Applicant(nric: String, password:      |
+|   String, age: int, maritalStatus:       |
+|   MaritalStatus)                         |
+| + applyForProject(project: Project,      |
+|   flatType: FlatType): void              |
+| + withdrawApplication(): void            |
+| + viewApplicationStatus(): void          |
+| + getApplication(): Application          |
+| + setApplication(application:            |
+|   Application): void                     |
++------------------------------------------+
 
-class HDBOfficer extends Applicant {
-  - registeredProjects: List<Project>
-  + registerForProject(project: Project): void
-  + viewProjectDetails(project: Project): void
-  + updateFlatAvailability(project: Project, flatType: FlatType, count: int): void
-  + bookFlat(application: Application): void
-  + replyEnquiry(enquiryID: int, reply: String): void
-  + generateReceipt(application: Application): Receipt
-}
++---------------------------------------------------------------------+
+|                           HDBOfficer                                |
++---------------------------------------------------------------------+
+| - registeredProjects: List<Project>                                 |
++---------------------------------------------------------------------+
+| + HDBOfficer(nric: String, password: String,                        |
+|   age: int, maritalStatus: MaritalStatus)                           |
+| + registerForProject(project: Project): void                        |
+| + viewProjectDetails(project: Project): void                        |
+| + updateFlatAvailability(project: Project, flatType: FlatType,      |
+|   count: int): void                                                 |
+| + bookFlat(application: Application): void                          |
+| + replyEnquiry(enquiry: Enquiry, reply: String): void               |
+| + generateReceipt(application: Application): Receipt                |
+| + getRegisteredProjects(): List<Project>                            |
++---------------------------------------------------------------------+
 
-class HDBManager extends User {
-  - projectsCreated: List<Project>
-  + createProject(projectDetails): void
-  + editProject(projectID: int, newDetails): void
-  + deleteProject(projectID: int): void
-  + toggleVisibility(projectID: int): void
-  + approveOfficerRegistration(officerID: int, projectID: int): void
-  + approveApplication(applicationID: int): void
-  + approveWithdrawal(applicationID: int): void
-  + generateReport(filterCriteria): Report
-  + replyEnquiry(enquiryID: int, reply: String): void
-}
+
++---------------------------------------------------------------+
+|                         HDBManager                            |
++---------------------------------------------------------------+
+| - projectsCreated: List<Project>                              |
++---------------------------------------------------------------+
+| + HDBManager(nric: String, password: String,                  |
+|   age: int, maritalStatus: MaritalStatus)                     |
+| + createProject(projectName: String, neighborhood: String,    |
+|   flatTypes: List<FlatType>, unitsAvailable:                 |
+|   Map<FlatType, Integer>, openingDate: Date,                  |
+|   closingDate: Date): void                                    |
+| + toggleVisibility(project: Project): void                    |
+| + approveOfficerRegistration(officer: HDBOfficer,             |
+|   project: Project): void                                     |
+| + approveApplication(application: Application): void          |
+| + approveWithdrawal(application: Application): void           |
++---------------------------------------------------------------+
+
 
 +--------------------------------------------------------+
 |                      Project                           |
@@ -83,48 +118,91 @@ class HDBManager extends User {
 +--------------------------------------------------------+
 
 
-class Application {
-  - applicant: Applicant
-  - project: Project
-  - status: ApplicationStatus
-  - flatTypeChosen: FlatType
-  + updateStatus(newStatus: ApplicationStatus): void
-}
++---------------------------------------------------+
+|                    Application                    |
++---------------------------------------------------+
+| - idCounter: int (static)                         |
+| - applicationID: int                              |
+| - applicant: Applicant                            |
+| - project: Project                                |
+| - status: ApplicationStatus                       |
+| - flatTypeChosen: FlatType                        |
++---------------------------------------------------+
+| + Application(applicant: Applicant,              |
+|   project: Project, flatTypeChosen: FlatType)     |
+| + updateStatus(newStatus: ApplicationStatus): void|
+| + getStatus(): ApplicationStatus                  |
+| + getFlatTypeChosen(): FlatType                   |
+| + getApplicant(): Applicant                       |
+| + getProject(): Project                           |
+| + getApplicationID(): int                         |
++---------------------------------------------------+
 
-class Enquiry {
-  - content: String
-  - applicant: Applicant
-  - project: Project
-  - reply: String
-}
 
-class Receipt {
-  - applicantName: String
-  - nric: String
-  - age: int
-  - maritalStatus: MaritalStatus
-  - flatType: FlatType
-  - projectName: String
-  - issueDate: Date
-}
++-----------------------------------------------------+
+|                      Enquiry                        |
++-----------------------------------------------------+
+| - idCounter: int (static)                           |
+| - enquiryID: int                                    |
+| - content: String                                   |
+| - submittedBy: User                                 |
+| - relatedProject: Project                           |
+| - reply: String                                     |
++-----------------------------------------------------+
+| + Enquiry(content: String, submittedBy: User,       |
+|   relatedProject: Project)                          |
+| + getEnquiryID(): int                               |
+| + getContent(): String                              |
+| + setContent(content: String): void                 |
+| + getSubmittedBy(): User                            |
+| + getRelatedProject(): Project                      |
+| + getReply(): String                                |
+| + setReply(reply: String): void                     |
+| + displayEnquiry(): void                            |
++-----------------------------------------------------+
+
++---------------------------------------------+
+|                  Receipt                    |
++---------------------------------------------+
+| - nric: String                              |
+| - age: int                                  |
+| - maritalStatus: MaritalStatus              |
+| - flatType: FlatType                        |
+| - projectName: String                       |
+| - issueDate: Date                           |
++---------------------------------------------+
+| + Receipt(nric: String, age: int,           |
+|           maritalStatus: MaritalStatus,     |
+|           flatType: FlatType,               |
+|           projectName: String,              |
+|           issueDate: Date)                  |
+| + displayReceipt(): void                    |
++---------------------------------------------+
+
 
 ' Enums
-enum ApplicationStatus {
-  PENDING
-  SUCCESSFUL
-  UNSUCCESSFUL
-  BOOKED
-}
++-------------------------+
+|   <<enum>> FlatType     |
++-------------------------+
+| TWOROOM                 |
+| THREEROOM               |
++-------------------------+
 
-enum MaritalStatus {
-  SINGLE
-  MARRIED
-}
++------------------------------+
+| <<enum>> MaritalStatus       |
++------------------------------+
+| SINGLE                       |
+| MARRIED                      |
++------------------------------+
 
-enum FlatType {
-  TWOROOM
-  THREEROOM
-}
++-------------------------------+
+| <<enum>> ApplicationStatus    |
++-------------------------------+
+| PENDING                       |
+| SUCCESSFUL                    |
+| UNSUCCESSFUL                  |
+| BOOKED                        |
++-------------------------------+
 
 ' Relationships
 User --> Enquiry : submit/view
