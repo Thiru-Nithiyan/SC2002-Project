@@ -45,20 +45,43 @@ class HDBManager extends User {
   + replyEnquiry(enquiryID: int, reply: String): void
 }
 
-class Project {
-  - projectName: String
-  - neighborhood: String
-  - flatTypes: List<FlatType>
-  - unitsAvailable: Dict<FlatType, int>
-  - openingDate: Date
-  - closingDate: Date
-  - visibility: Boolean
-  - officerSlots: int
-  - applicantsList: List<Applicant>
-  - officersList: List<HDBOfficer>
-  - managerInCharge: HDBManager
-  + filterProjectList(criteria): List<Project>
-}
++--------------------------------------------------------+
+|                      Project                           |
++--------------------------------------------------------+
+| - projectName: String                                  |
+| - neighborhood: String                                 |
+| - flatTypes: List<FlatType>                            |
+| - unitsAvailable: Map<FlatType, Integer>               |
+| - openingDate: Date                                    |
+| - closingDate: Date                                    |
+| - visibility: boolean                                  |
+| - officerSlots: int                                    |
+| - applicantsList: List<Applicant>                      |
+| - officersList: List<HDBOfficer>                       |
+| - managerInCharge: HDBManager                          |
+| - enquiries: List<Enquiry>                             |
++--------------------------------------------------------+
+| + Project( need add  arguments )                       |
+| + getProjectName(): String                             |
+| + getNeighborhood(): String                            |
+| + getFlatTypes(): List<FlatType>                       |
+| + getUnitsAvailable(): Map<FlatType, Integer>          |
+| + getOpeningDate(): Date                               |
+| + getClosingDate(): Date                               |
+| + isVisible(): boolean                                 |
+| + setVisibility(boolean): void                         |
+| + getOfficerSlots(): int                               |
+| + getApplicantsList(): List<Applicant>                 |
+| + getOfficersList(): List<HDBOfficer>                  |
+| + getManagerInCharge(): HDBManager                     |
+| + getEnquiries(): List<Enquiry>                        |
+| + addApplicant(Applicant): void                        |
+| + addOfficer(HDBOfficer): void                         |
+| + addEnquiry(Enquiry): void                            |
+| + updateFlatUnits(FlatType, int): void                 |
+| + displayProjectDetails(): void                        |
++--------------------------------------------------------+
+
 
 class Application {
   - applicant: Applicant
