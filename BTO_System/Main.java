@@ -1,5 +1,6 @@
 package BTO_System;
 
+
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -8,6 +9,11 @@ public class Main {
     private static List<Project> projects = new ArrayList<>();
     private static List<Enquiry> enquiries = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
+
+private static boolean isDateOverlap(Project p1, Project p2) {
+    return !(p1.getClosingDate().before(p2.getOpeningDate()) || p1.getOpeningDate().after(p2.getClosingDate()));
+}
+    
 
     public static void main(String[] args) {
         loadInitialData();
@@ -67,7 +73,7 @@ public class Main {
             Project acacia = new Project("Acacia Breeze", "Yishun", flatTypes, units,
                     sdf.parse("2025-02-15"), sdf.parse("2025-03-20"), jessica);
             acacia.addOfficer(daniel);
-            acacia.addOfficer(emily);
+            // acacia.addOfficer(emily);
             projects.add(acacia);
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +130,6 @@ public class Main {
                         System.out.println("Project not found or not visible.");
                         break;
                     }
-
                     if (applicant.getMaritalStatus() == MaritalStatus.SINGLE) {
                         if (applicant.getAge() < 35) {
                             System.out.println("You must be at least 35 and single to apply.");
@@ -141,6 +146,16 @@ public class Main {
                                 applicant.applyForProject(selected, type);
                             } catch (IllegalArgumentException e) {
                                 System.out.println("Invalid flat type.");
+                            }
+                        }
+                    }
+                    //added this
+                    if (applicant instanceof HDBOfficer) {
+                        HDBOfficer officer = (HDBOfficer) applicant;
+                        for (Project registered : officer.getRegisteredProjects()) {
+                            if (registered == selected || isDateOverlap(registered, selected)) {
+                                System.out.println("You cannot apply for this project because you are registered as an officer for a conflicting project.");
+                                return;
                             }
                         }
                     }
@@ -220,8 +235,22 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    officer.getRegisteredProjects().forEach(p -> System.out.println("- " + p.getProjectName()));
-                    break;
+                System.out.println("[Registered Projects]");
+                boolean hasRegistered = false;
+                for (Project p : projects) {
+                    if (p.getOfficersList().contains(officer)) {
+                        System.out.println("✔ " + p.getProjectName() + " (Approved)");
+                        hasRegistered = true;
+                    } else if (p.getPendingOfficerRequests().contains(officer)) {
+                        System.out.println("🕓 " + p.getProjectName() + " (Pending Approval)");
+                        hasRegistered = true;
+                    }
+                }
+                if (!hasRegistered) {
+                    System.out.println("You are not registered or pending for any projects.");
+                }
+                break;
+            
                 case 2:
                     System.out.print("Enter project name to register: ");
                     String name = scanner.nextLine();
@@ -231,10 +260,12 @@ public class Main {
                         System.out.println("Project not found.");
                         break;
                     }
-                    if (officer.getApplication() != null &&
-                        officer.getApplication().getProject() == regProj) {
-                        System.out.println("Cannot register as officer for a project you applied to.");
-                        break;
+                    if (officer.getApplication() != null) {
+                        Project appliedProj = officer.getApplication().getProject();
+                        if (regProj == appliedProj || isDateOverlap(regProj, appliedProj)) {
+                            System.out.println("Cannot register as officer due to conflict with your application project.");
+                            break;
+                        }
                     }
                     boolean conflict = officer.getRegisteredProjects().stream().anyMatch(
                         p -> !(regProj.getClosingDate().before(p.getOpeningDate()) || regProj.getOpeningDate().after(p.getClosingDate()))
@@ -243,8 +274,23 @@ public class Main {
                         System.out.println("Conflict with another registered project.");
                         break;
                     }
-                    officer.registerForProject(regProj);
+
+                    if (regProj.getOfficersList().contains(officer)) {
+                        System.out.println("You are already registered for this project.");
+                        break;
+                    }
+                    
+                    if (regProj.getPendingOfficerRequests().contains(officer)) {
+                        System.out.println("Your registration request for this project is still pending approval.");
+                        break;
+                    }
+                    
+                    // Proceed with checks and then add request
+                    regProj.addPendingOfficerRequest(officer);
+                    System.out.println("Registration request submitted. Awaiting manager approval.");
+                
                     break;
+                    
                 case 3:
                     System.out.print("Enter project name: ");
                     String projName = scanner.nextLine();
@@ -396,15 +442,24 @@ public class Main {
                 case 7:
                 for (Project p : projects) {
                     if (p.getManagerInCharge().equals(manager)) {
-                        for (User u : users) {
-                            if (u instanceof HDBOfficer) {
-                                HDBOfficer o = (HDBOfficer) u;
-                                if (!p.getOfficersList().contains(o)) {
-                                    System.out.println("Approve " + o.getNric() + " for " + p.getProjectName() + "? (y/n): ");
-                                    if (scanner.nextLine().equalsIgnoreCase("y")) {
-                                        manager.approveOfficerRegistration(o, p);
-                                    }
+                        Iterator<HDBOfficer> iterator = p.getPendingOfficerRequests().iterator();
+                        while (iterator.hasNext()) {
+                            HDBOfficer officer = iterator.next();
+            
+                            // Application conflict check
+                            if (officer.getApplication() != null) {
+                                Project appliedProj = officer.getApplication().getProject();
+                                if (p == appliedProj || isDateOverlap(p, appliedProj)) {
+                                    System.out.println("Officer " + officer.getNric() + " cannot be approved due to conflict with their application.");
+                                    continue;
                                 }
+                            }
+            
+                            System.out.println("Approve officer " + officer.getNric() + " for project " + p.getProjectName() + "? (y/n): ");
+                            if (scanner.nextLine().equalsIgnoreCase("y")) {
+                                manager.approveOfficerRegistration(officer, p);
+                                iterator.remove();
+                                System.out.println("Approved and registered.");
                             }
                         }
                     }

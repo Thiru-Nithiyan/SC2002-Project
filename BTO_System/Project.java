@@ -15,6 +15,8 @@ public class Project {
     private List<HDBOfficer> officersList;
     private HDBManager managerInCharge;
     private List<Enquiry> enquiries;
+    private List<HDBOfficer> pendingOfficerRequests = new ArrayList<>();
+
 
     public Project(String projectName, String neighborhood, List<FlatType> flatTypes, 
                    Map<FlatType, Integer> unitsAvailable, Date openingDate, 
@@ -119,4 +121,20 @@ public class Project {
         System.out.println("Visibility: " + (visibility ? "Visible" : "Hidden"));
         System.out.println("Remaining Officer Slots: " + (officerSlots - officersList.size()));
     }
+
+    public List<HDBOfficer> getPendingOfficerRequests() {
+        return pendingOfficerRequests;
+    }
+    
+    public void addPendingOfficerRequest(HDBOfficer officer) {
+        if (!pendingOfficerRequests.contains(officer)) {
+            pendingOfficerRequests.add(officer);
+        }
+    }
+    
+    public void removePendingOfficerRequest(HDBOfficer officer) {
+        pendingOfficerRequests.remove(officer);
+    }
+    
 }
+
