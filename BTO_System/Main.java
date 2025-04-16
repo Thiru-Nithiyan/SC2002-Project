@@ -98,7 +98,8 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("4. Withdraw Application");
             System.out.println("5. Submit Enquiry");
             System.out.println("6. View/Edit/Delete My Enquiries");
-            System.out.println("7. Logout");
+            System.out.println("7. Change Password");
+            System.out.println("8. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -212,6 +213,13 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     }
                     break;
                 case 7:
+                    System.out.print("Enter your new password: ");
+                    String newPassword = scanner.nextLine();
+                    applicant.changePassword(newPassword);
+                    System.out.println("Password changed successfully.");
+                    break;
+                
+                case 8:
                     return;
                 default:
                     System.out.println("Invalid option.");
@@ -229,7 +237,8 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("5. Book Flat for Applicant");
             System.out.println("6. Generate Receipt");
             System.out.println("7. Use Applicant Features");
-            System.out.println("8. Logout");
+            System.out.println("8. Change Password");
+            System.out.println("9. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
 
@@ -341,6 +350,13 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     applicantMenu(officer);
                     break;
                 case 8:
+                    System.out.print("Enter your new password: ");
+                    String newPassword = scanner.nextLine();
+                    officer.changePassword(newPassword);
+                    System.out.println("Password changed successfully.");
+                    break;
+                
+                case 9:
                     return;
                 default:
                     System.out.println("Invalid option.");
@@ -363,7 +379,8 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("10. Generate Application Report");
             System.out.println("11. View All Enquiries");
             System.out.println("12. Reply to Enquiries (My Projects)");
-            System.out.println("13. Logout");
+            System.out.println("13. Change Password");
+            System.out.println("14. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
     
@@ -550,6 +567,13 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     }
                     break;
                 case 13:
+                    System.out.print("Enter your new password: ");
+                    String newPassword = scanner.nextLine();
+                    manager.changePassword(newPassword);
+                    System.out.println("Password changed successfully.");
+                    break;
+                
+                case 14:
                     return;
                 default:
                     System.out.println("Invalid option.");
