@@ -380,7 +380,8 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("11. View All Enquiries");
             System.out.println("12. Reply to Enquiries (My Projects)");
             System.out.println("13. Change Password");
-            System.out.println("14. Logout");
+            System.out.println("14. Filter Projects");
+            System.out.println("15. Logout");
             System.out.print("Choose an option: ");
             int choice = Integer.parseInt(scanner.nextLine());
     
@@ -484,40 +485,68 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                 break;
             
                 case 8:
-                    for (Project p : projects) {
-                        if (p.getManagerInCharge().equals(manager)) {
-                            for (Applicant a : p.getApplicantsList()) {
-                                Application app = a.getApplication();
-                                if (app.getStatus() == ApplicationStatus.PENDING) {
-                                    System.out.println("Approve application " + app.getApplicationID() + " for " + a.getNric() + "? (y/n): ");
-                                    if (scanner.nextLine().equalsIgnoreCase("y")) {
-                                        if (p.getUnitsAvailable().get(app.getFlatTypeChosen()) > 0) {
-                                            manager.approveApplication(app);
-                                            p.updateFlatUnits(app.getFlatTypeChosen(), p.getUnitsAvailable().get(app.getFlatTypeChosen()) - 1);
-                                        } else {
-                                            System.out.println("No available units.");
-                                        }
+                boolean foundPending = false;
+                for (Project p : projects) {
+                    if (p.getManagerInCharge().equals(manager)) {
+                        for (Applicant a : p.getApplicantsList()) {
+                            Application app = a.getApplication();
+                            if (app != null && app.getStatus() == ApplicationStatus.PENDING && app.getProject().equals(p)) {
+                                foundPending = true;
+                                System.out.println("\n--- Pending Application ---");
+                                System.out.println("Application ID: " + app.getApplicationID());
+                                System.out.println("Applicant NRIC: " + a.getNric());
+                                System.out.println("Project: " + p.getProjectName());
+                                System.out.println("Flat Type: " + app.getFlatTypeChosen());
+                                System.out.print("Approve (a) / Reject (r) / Skip (s): ");
+                                String decision = scanner.nextLine();
+            
+                                if (decision.equalsIgnoreCase("a")) {
+                                    if (p.getUnitsAvailable().get(app.getFlatTypeChosen()) > 0) {
+                                        manager.approveApplication(app);
+                                        p.updateFlatUnits(app.getFlatTypeChosen(),
+                                                p.getUnitsAvailable().get(app.getFlatTypeChosen()) - 1);
+                                        System.out.println("✅ Application approved.");
+                                    } else {
+                                        System.out.println("❌ No units left for this flat type.");
                                     }
+                                } else if (decision.equalsIgnoreCase("r")) {
+                                    app.updateStatus(ApplicationStatus.UNSUCCESSFUL);
+                                    System.out.println("❌ Application rejected.");
+                                } else {
+                                    System.out.println("⏭️ Skipped.");
                                 }
                             }
                         }
                     }
-                    break;
+                }
+            
+                if (!foundPending) {
+                    System.out.println("No pending applications found.");
+                }
+                break;
+            
+            
                 case 9:
-                    for (Project p : projects) {
-                        if (p.getManagerInCharge().equals(manager)) {
-                            for (Applicant a : p.getApplicantsList()) {
-                                Application app = a.getApplication();
-                                if (app.getStatus() == ApplicationStatus.UNSUCCESSFUL) {
-                                    System.out.println("Confirm withdrawal of " + a.getNric() + "? (y/n): ");
-                                    if (scanner.nextLine().equalsIgnoreCase("y")) {
-                                        manager.approveWithdrawal(app);
-                                    }
+                for (Project p : projects) {
+                    if (p.getManagerInCharge().equals(manager)) {
+                        for (Applicant a : p.getApplicantsList()) {
+                            Application app = a.getApplication();
+                            if (app.getStatus() == ApplicationStatus.UNSUCCESSFUL) {
+                                System.out.println("Withdrawal Request from: " + a.getNric() +
+                                                   " (Project: " + app.getProject().getProjectName() + ")");
+                                System.out.print("Approve withdrawal? (y/n): ");
+                                if (scanner.nextLine().equalsIgnoreCase("y")) {
+                                    manager.approveWithdrawal(app);
+                                    System.out.println("✅ Withdrawal approved.");
+                                } else {
+                                    System.out.println("⏭️ Withdrawal skipped.");
                                 }
                             }
                         }
                     }
-                    break;
+                }
+                break;
+            
                 case 10:
                 System.out.print("Filter by flat type (optional, press enter to skip): ");
                 String typeFilter = scanner.nextLine();
@@ -574,6 +603,39 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     break;
                 
                 case 14:
+                    System.out.print("Enter neighborhood to filter (or press Enter to skip): ");
+                    String neighborhood = scanner.nextLine();
+                    if (neighborhood.isBlank()) neighborhood = null;
+                
+                    System.out.print("Enter flat type (TWOROOM/THREEROOM or press Enter to skip): ");
+                    String ftInput = scanner.nextLine();
+                    FlatType flatType = null;
+                    if (!ftInput.isBlank()) {
+                        try {
+                            flatType = FlatType.valueOf(ftInput.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Invalid flat type.");
+                        }
+                    }
+                
+                    System.out.print("Only show visible projects? (y/n): ");
+                    String visibleInput = scanner.nextLine();
+                    Boolean visibleOnly = null;
+                    if (visibleInput.equalsIgnoreCase("y")) visibleOnly = true;
+                    else if (visibleInput.equalsIgnoreCase("n")) visibleOnly = false;
+                
+                    List<Project> filtered = Project.filterProjectList(projects, neighborhood, flatType, visibleOnly);
+                    if (filtered.isEmpty()) {
+                        System.out.println("No matching projects found.");
+                    } else {
+                        for (Project p : filtered) {
+                            p.displayProjectDetails();
+                        }
+                    }
+                    break;
+                                    
+
+                case 15:
                     return;
                 default:
                     System.out.println("Invalid option.");
