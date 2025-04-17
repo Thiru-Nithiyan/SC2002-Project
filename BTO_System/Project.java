@@ -135,6 +135,21 @@ public class Project {
     public void removePendingOfficerRequest(HDBOfficer officer) {
         pendingOfficerRequests.remove(officer);
     }
+
+    public static List<Project> filterProjectList(List<Project> projects, String neighborhoodFilter, FlatType flatTypeFilter, Boolean visibleOnly) {
+        List<Project> filtered = new ArrayList<>();
+        for (Project p : projects) {
+            boolean matchNeighborhood = (neighborhoodFilter == null || p.getNeighborhood().equalsIgnoreCase(neighborhoodFilter));
+            boolean matchFlatType = (flatTypeFilter == null || p.getFlatTypes().contains(flatTypeFilter));
+            boolean matchVisibility = (visibleOnly == null || p.isVisible() == visibleOnly);
+
+            if (matchNeighborhood && matchFlatType && matchVisibility) {
+                filtered.add(p);
+            }
+        }
+        return filtered;
+    }
+
     
 }
 
