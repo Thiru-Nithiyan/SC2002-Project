@@ -67,4 +67,9 @@ public class HDBOfficer extends Applicant {
     public List<Project> getRegisteredProjects() {
         return registeredProjects;
     }
+
+    public void addRegisteredProject(Project project) {
+        registeredProjects.add(project);
+    }
+    
 }

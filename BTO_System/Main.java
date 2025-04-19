@@ -72,7 +72,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
 
             Project acacia = new Project("Acacia Breeze", "Yishun", flatTypes, units,
                     sdf.parse("2025-02-15"), sdf.parse("2025-03-20"), jessica);
-            acacia.addOfficer(daniel);
+            //acacia.addOfficer(daniel);
             // acacia.addOfficer(emily);
             projects.add(acacia);
         } catch (Exception e) {
@@ -101,7 +101,16 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("7. Change Password");
             System.out.println("8. Logout");
             System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice;
+            try {
+                System.out.print("Choose an option: ");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a number.");
+                continue; // Go back to menu
+            }
+
+            
 
             switch (choice) {
                 case 1:
@@ -115,42 +124,49 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     break;
                 case 2:
                     if (applicant.getApplication() != null &&
-                            (applicant.getApplication().getStatus() == ApplicationStatus.PENDING ||
-                             applicant.getApplication().getStatus() == ApplicationStatus.SUCCESSFUL ||
-                             applicant.getApplication().getStatus() == ApplicationStatus.BOOKED)) {
+                        (applicant.getApplication().getStatus() == ApplicationStatus.PENDING ||
+                         applicant.getApplication().getStatus() == ApplicationStatus.SUCCESSFUL ||
+                         applicant.getApplication().getStatus() == ApplicationStatus.BOOKED)) {
                         System.out.println("You already have an ongoing application.");
                         break;
                     }
+                
                     System.out.print("Enter project name: ");
                     String pname = scanner.nextLine();
                     Project selected = projects.stream()
                         .filter(p -> p.getProjectName().equalsIgnoreCase(pname) && p.isVisible())
                         .findFirst().orElse(null);
-
+                
                     if (selected == null) {
                         System.out.println("Project not found or not visible.");
                         break;
                     }
-                    if (applicant.getMaritalStatus() == MaritalStatus.SINGLE) {
-                        if (applicant.getAge() < 35) {
-                            System.out.println("You must be at least 35 and single to apply.");
-                        } else {
-                            applicant.applyForProject(selected, FlatType.TWOROOM);
-                        }
-                    } else {
-                        if (applicant.getAge() < 21) {
-                            System.out.println("You must be at least 21 and married to apply.");
-                        } else {
-                            System.out.print("Enter flat type (TWOROOM/THREEROOM): ");
-                            try {
-                                FlatType type = FlatType.valueOf(scanner.nextLine().toUpperCase());
-                                applicant.applyForProject(selected, type);
-                            } catch (IllegalArgumentException e) {
-                                System.out.println("Invalid flat type.");
-                            }
-                        }
+                
+                    // Eligibility check
+                    if ((applicant.getMaritalStatus() == MaritalStatus.SINGLE && applicant.getAge() < 35) ||
+                        (applicant.getMaritalStatus() == MaritalStatus.MARRIED && applicant.getAge() < 21)) {
+                        System.out.println("You are not eligible to apply due to age/marital status.");
+                        break;
                     }
-                    //added this
+                
+                    // Ask for flat type choice
+                    System.out.print("Enter flat type to apply for (TWOROOM / THREEROOM): ");
+                    try {
+                        FlatType chosenType = FlatType.valueOf(scanner.nextLine().toUpperCase());
+                
+                        // Optionally enforce that singles can only choose TWOROOM
+                        if (applicant.getMaritalStatus() == MaritalStatus.SINGLE && chosenType != FlatType.TWOROOM) {
+                            System.out.println("Single applicants are only allowed to apply for TWOROOM flats.");
+                            break;
+                        }
+                
+                        applicant.applyForProject(selected, chosenType);
+                
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid flat type entered.");
+                    }
+                
+                    // Officer dual-role conflict check
                     if (applicant instanceof HDBOfficer) {
                         HDBOfficer officer = (HDBOfficer) applicant;
                         for (Project registered : officer.getRegisteredProjects()) {
@@ -160,7 +176,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                             }
                         }
                     }
-                    break;
+                    break;                
                 case 3:
                     applicant.viewApplicationStatus();
                     break;
@@ -234,32 +250,42 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("2. Register for Project");
             System.out.println("3. View Project Details");
             System.out.println("4. View/Reply Enquiries");
-            System.out.println("5. Book Flat for Applicant");
-            System.out.println("6. Generate Receipt");
-            System.out.println("7. Use Applicant Features");
-            System.out.println("8. Change Password");
-            System.out.println("9. Logout");
+            System.out.println("5. Update Flat Availability");
+            System.out.println("6. Book Flat for Applicant");
+            System.out.println("7. Finalize Booking");
+            System.out.println("8. Generate Receipt");
+            System.out.println("9. Use Applicant Features");
+            System.out.println("10. Change Password");
+            System.out.println("11. Logout");
             System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice;
+            try {
+                System.out.print("Choose an option: ");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a number.");
+                continue; // Go back to menu
+            }
 
+    
             switch (choice) {
                 case 1:
-                System.out.println("[Registered Projects]");
-                boolean hasRegistered = false;
-                for (Project p : projects) {
-                    if (p.getOfficersList().contains(officer)) {
-                        System.out.println("✔ " + p.getProjectName() + " (Approved)");
-                        hasRegistered = true;
-                    } else if (p.getPendingOfficerRequests().contains(officer)) {
-                        System.out.println("🕓 " + p.getProjectName() + " (Pending Approval)");
-                        hasRegistered = true;
+                    System.out.println("[Registered Projects]");
+                    boolean hasRegistered = false;
+                    for (Project p : projects) {
+                        if (p.getOfficersList().contains(officer)) {
+                            System.out.println("✔ " + p.getProjectName() + " (Approved)");
+                            hasRegistered = true;
+                        } else if (p.getPendingOfficerRequests().contains(officer)) {
+                            System.out.println("🕓 " + p.getProjectName() + " (Pending Approval)");
+                            hasRegistered = true;
+                        }
                     }
-                }
-                if (!hasRegistered) {
-                    System.out.println("You are not registered or pending for any projects.");
-                }
-                break;
-            
+                    if (!hasRegistered) {
+                        System.out.println("You are not registered or pending for any projects.");
+                    }
+                    break;
+    
                 case 2:
                     System.out.print("Enter project name to register: ");
                     String name = scanner.nextLine();
@@ -277,36 +303,35 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                         }
                     }
                     boolean conflict = officer.getRegisteredProjects().stream().anyMatch(
-                        p -> !(regProj.getClosingDate().before(p.getOpeningDate()) || regProj.getOpeningDate().after(p.getClosingDate()))
+                            p -> !(regProj.getClosingDate().before(p.getOpeningDate()) || regProj.getOpeningDate().after(p.getClosingDate()))
                     );
                     if (conflict) {
                         System.out.println("Conflict with another registered project.");
                         break;
                     }
-
+    
                     if (regProj.getOfficersList().contains(officer)) {
                         System.out.println("You are already registered for this project.");
                         break;
                     }
-                    
+    
                     if (regProj.getPendingOfficerRequests().contains(officer)) {
                         System.out.println("Your registration request for this project is still pending approval.");
                         break;
                     }
-                    
-                    // Proceed with checks and then add request
+    
                     regProj.addPendingOfficerRequest(officer);
                     System.out.println("Registration request submitted. Awaiting manager approval.");
-                
                     break;
-                    
+    
                 case 3:
                     System.out.print("Enter project name: ");
                     String projName = scanner.nextLine();
                     projects.stream()
-                        .filter(p -> p.getProjectName().equalsIgnoreCase(projName))
-                        .findFirst().ifPresent(Project::displayProjectDetails);
+                            .filter(p -> p.getProjectName().equalsIgnoreCase(projName))
+                            .findFirst().ifPresent(Project::displayProjectDetails);
                     break;
+    
                 case 4:
                     for (Project pr : officer.getRegisteredProjects()) {
                         for (Enquiry e : pr.getEnquiries()) {
@@ -319,50 +344,164 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                         }
                     }
                     break;
+    
                 case 5:
-                    System.out.print("Enter NRIC of applicant to book: ");
-                    String nric = scanner.nextLine();
-                    users.stream().filter(u -> u instanceof Applicant && u.getNric().equalsIgnoreCase(nric))
-                        .map(u -> (Applicant) u)
-                        .findFirst().ifPresent(app -> {
-                            if (app.getApplication() != null &&
-                                app.getApplication().getStatus() == ApplicationStatus.SUCCESSFUL) {
-                                officer.bookFlat(app.getApplication());
-                            } else {
-                                System.out.println("Not eligible or not found.");
-                            }
-                        });
+                    System.out.println("[Update Flat Availability for Your Projects]");
+                    List<Project> registeredProjects = officer.getRegisteredProjects();
+                    if (registeredProjects.isEmpty()) {
+                        System.out.println("You are not approved for any projects.");
+                        break;
+                    }
+    
+                    for (int i = 0; i < registeredProjects.size(); i++) {
+                        System.out.println((i + 1) + ". " + registeredProjects.get(i).getProjectName());
+                    }
+    
+                    System.out.print("Select a project to update: ");
+                    int selection = Integer.parseInt(scanner.nextLine()) - 1;
+    
+                    if (selection < 0 || selection >= registeredProjects.size()) {
+                        System.out.println("Invalid selection.");
+                        break;
+                    }
+    
+                    Project projToUpdate = registeredProjects.get(selection);
+                    for (FlatType type : projToUpdate.getFlatTypes()) {
+                        System.out.print("Enter updated units for " + type + ": ");
+                        int count = Integer.parseInt(scanner.nextLine());
+                        projToUpdate.updateFlatUnits(type, count);
+                    }
+    
+                    System.out.println("✅ Flat availability updated for project: " + projToUpdate.getProjectName());
                     break;
+    
                 case 6:
-                System.out.print("Enter NRIC of applicant: ");
-                String receiptNric = scanner.nextLine();
-                users.stream().filter(u -> u instanceof Applicant && u.getNric().equalsIgnoreCase(receiptNric))
-                    .map(u -> (Applicant) u)
-                    .findFirst().ifPresentOrElse(app -> {
-                        if (app.getApplication() == null) {
-                            System.out.println("This applicant has not applied for any projects yet.");
-                        } else {
-                            Receipt r = officer.generateReceipt(app.getApplication());
-                            if (r != null) r.displayReceipt();
+                    System.out.println("[Finalize Flat Booking for Applicant]");
+                    System.out.print("Enter NRIC of applicant: ");
+                    String bookNric = scanner.nextLine();
+    
+                    Applicant applicant = users.stream()
+                            .filter(u -> u instanceof Applicant && u.getNric().equalsIgnoreCase(bookNric))
+                            .map(u -> (Applicant) u)
+                            .findFirst().orElse(null);
+    
+                    if (applicant == null) {
+                        System.out.println("Applicant not found.");
+                        break;
+                    }
+    
+                    Application app = applicant.getApplication();
+                    if (app == null || app.getStatus() != ApplicationStatus.SUCCESSFUL) {
+                        System.out.println("Applicant does not have a SUCCESSFUL application.");
+                        break;
+                    }
+    
+                    Project project = app.getProject();
+                    if (!officer.getRegisteredProjects().contains(project)) {
+                        System.out.println("You are not registered for the project this applicant applied to.");
+                        break;
+                    }
+    
+                    System.out.print("Confirm flat type for booking (TWOROOM / THREEROOM): ");
+                    try {
+                        FlatType chosenType = FlatType.valueOf(scanner.nextLine().toUpperCase());
+                        int available = project.getUnitsAvailable().getOrDefault(chosenType, 0);
+    
+                        if (available <= 0) {
+                            System.out.println("❌ No available units for selected flat type.");
+                            break;
                         }
-                    }, () -> System.out.println("Applicant not found."));
+    
+                        project.updateFlatUnits(chosenType, available - 1);
+                        app.updateStatus(ApplicationStatus.BOOKED);
+                        app.setFlatTypeChosen(chosenType);
+    
+                        System.out.println("✅ Booking finalized: " + applicant.getNric() + " is now BOOKED for a " + chosenType + " flat.");
+    
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid flat type.");
+                    }
+                    break;
                 case 7:
+                    System.out.println("[Finalize Flat Booking for Applicant]");
+                    System.out.print("Enter NRIC of applicant: ");
+                    String bookNricc = scanner.nextLine();
+                
+                    Applicant Applicant = users.stream()
+                        .filter(u -> u instanceof Applicant && u.getNric().equalsIgnoreCase(bookNricc))
+                        .map(u -> (Applicant) u)
+                        .findFirst().orElse(null);
+                
+                    if (Applicant == null) {
+                        System.out.println("Applicant not found.");
+                        break;
+                    }
+                
+                    Application App = Applicant.getApplication();
+                    if (App == null || App.getStatus() != ApplicationStatus.SUCCESSFUL) {
+                        System.out.println("Applicant does not have a SUCCESSFUL application.");
+                        break;
+                    }
+                
+                    Project Project = App.getProject();
+                    if (!officer.getRegisteredProjects().contains(Project)) {
+                        System.out.println("You are not registered for the project this applicant applied to.");
+                        break;
+                    }
+                
+                    System.out.print("Confirm flat type for booking (TWOROOM / THREEROOM): ");
+                    try {
+                        FlatType chosenType = FlatType.valueOf(scanner.nextLine().toUpperCase());
+                
+                        if (!App.getFlatTypeChosen().equals(chosenType)) {
+                            System.out.println("⚠️ Warning: This applicant was approved for a different flat type: " + App.getFlatTypeChosen());
+                            break;
+                        }
+                
+                        App.updateStatus(ApplicationStatus.BOOKED);
+                        System.out.println("✅ Booking finalized: " + Applicant.getNric() + " is now BOOKED for a " + chosenType + " flat.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Invalid flat type.");
+                    }
+                    break;
+                
+                
+    
+                case 8:
+                    System.out.print("Enter NRIC of applicant: ");
+                    String receiptNric = scanner.nextLine();
+                    users.stream().filter(u -> u instanceof Applicant && u.getNric().equalsIgnoreCase(receiptNric))
+                            .map(u -> (Applicant) u)
+                            .findFirst().ifPresentOrElse(app3 -> {
+                                if (app3.getApplication() == null) {
+                                    System.out.println("This applicant has not applied for any projects yet./ No yet Successfull");
+                                } else {
+                                    Receipt r = officer.generateReceipt(app3.getApplication());
+                                    if (r != null) r.displayReceipt();
+                                }
+                            }, () -> System.out.println("Applicant not found."));
+                    break;
+    
+                case 9:
                     applicantMenu(officer);
                     break;
-                case 8:
+    
+                case 10:
                     System.out.print("Enter your new password: ");
                     String newPassword = scanner.nextLine();
                     officer.changePassword(newPassword);
                     System.out.println("Password changed successfully.");
                     break;
-                
-                case 9:
+    
+                case 11:
                     return;
+    
                 default:
                     System.out.println("Invalid option.");
             }
         }
     }
+    
 
     private static void managerMenu(HDBManager manager) {
         while (true) {
@@ -381,9 +520,18 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             System.out.println("12. Reply to Enquiries (My Projects)");
             System.out.println("13. Change Password");
             System.out.println("14. Filter Projects");
-            System.out.println("15. Logout");
+            System.out.println("15. Generate Booked Flats Report");
+            System.out.println("16. Logout");
             System.out.print("Choose an option: ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice;
+            try {
+                System.out.print("Choose an option: ");
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a number.");
+                continue; // Go back to menu
+            }
+
     
             switch (choice) {
                 case 1:
@@ -633,9 +781,69 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                         }
                     }
                     break;
+                case 15:
+                    System.out.println("📋 Booked Flats Report with Filters");
+                
+                    System.out.print("Filter by flat type (TWOROOM / THREEROOM or press Enter to skip): ");
+                    String flatTypeInput = scanner.nextLine().trim();
+                    FlatType filterType = null;
+                    if (!flatTypeInput.isEmpty()) {
+                        try {
+                            filterType = FlatType.valueOf(flatTypeInput.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Invalid flat type. Skipping flat type filter.");
+                        }
+                    }
+                
+                    System.out.print("Filter by marital status (SINGLE / MARRIED or press Enter to skip): ");
+                    String maritalInput = scanner.nextLine().trim();
+                    MaritalStatus filterStatus = null;
+                    if (!maritalInput.isEmpty()) {
+                        try {
+                            filterStatus = MaritalStatus.valueOf(maritalInput.toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Invalid marital status. Skipping marital status filter.");
+                        }
+                    }
+                
+                    boolean anyBooked = false;
+                    for (Project p : projects) {
+                        if (p.getManagerInCharge().equals(manager)) {
+                            List<Applicant> applicants = p.getApplicantsList();
+                            boolean projectPrinted = false;
+                
+                            for (Applicant a : applicants) {
+                                Application app = a.getApplication();
+                                if (app != null && app.getStatus() == ApplicationStatus.BOOKED && app.getProject().equals(p)) {
+                                    // Apply filters
+                                    if ((filterType != null && app.getFlatTypeChosen() != filterType) ||
+                                        (filterStatus != null && a.getMaritalStatus() != filterStatus)) {
+                                        continue; // skip if doesn't match filter
+                                    }
+                
+                                    if (!projectPrinted) {
+                                        System.out.println("\n📌 Project: " + p.getProjectName());
+                                        projectPrinted = true;
+                                    }
+                
+                                    System.out.println(" - NRIC: " + a.getNric() +
+                                                       ", Flat: " + app.getFlatTypeChosen() +
+                                                       ", Marital Status: " + a.getMaritalStatus());
+                                    anyBooked = true;
+                                }
+                            }
+                        }
+                    }
+                
+                    if (!anyBooked) {
+                        System.out.println("No booked flats found matching the criteria.");
+                    }
+                    break;
+                
+                
                                     
 
-                case 15:
+                case 16:
                     return;
                 default:
                     System.out.println("Invalid option.");

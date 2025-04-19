@@ -25,8 +25,10 @@ public class HDBManager extends User {
     // Approve an officer registration
     public void approveOfficerRegistration(HDBOfficer officer, Project project) {
         project.addOfficer(officer);
+        officer.addRegisteredProject(project); // ✅ Add this line
         System.out.println("Officer " + officer.getNric() + " approved for project " + project.getProjectName());
     }
+    
 
     // Approve an application
     public void approveApplication(Application application) {

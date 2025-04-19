@@ -39,4 +39,9 @@ class Application {
     public int getApplicationID() {
         return applicationID;
     }
+
+    public void setFlatTypeChosen(FlatType flatTypeChosen) {
+        this.flatTypeChosen = flatTypeChosen;
+    }
+    
 }
