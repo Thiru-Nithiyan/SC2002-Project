@@ -480,7 +480,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                 case 4:
                     System.out.print("Enter project name to edit: ");
                     String editName = scanner.nextLine();
-                    Project editProj = findProjectByNameAndManager(editName, manager);
+                    Project editProj = Project.findProjectByNameAndManager(editName, manager, projects);
                     if (editProj != null) {
                         for (FlatType type : editProj.getFlatTypes()) {
                             System.out.print("New unit count for " + type + ": ");
@@ -494,7 +494,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                 case 5:
                     System.out.print("Enter project name to delete: ");
                     String delName = scanner.nextLine();
-                    Project delProj = findProjectByNameAndManager(delName, manager);
+                    Project delProj = Project.findProjectByNameAndManager(delName, manager, projects);
                     if (delProj != null) {
                         projects.remove(delProj);
                         System.out.println("Deleted.");
@@ -513,7 +513,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     }
                     break;
                 case 7:
-                    Project activeProject7 = selectActiveProject(manager);
+                    Project activeProject7 = Project.selectActiveProject(manager, projects, scanner);
                     if (activeProject7 == null) break;
                     Iterator<HDBOfficer> iterator = activeProject7.getPendingOfficerRequests().iterator();
                     while (iterator.hasNext()) {
@@ -536,7 +536,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                 
             
                 case 8:
-                    Project activeProject8 = selectActiveProject(manager);
+                    Project activeProject8 = Project.selectActiveProject(manager, projects, scanner);
                     if (activeProject8 == null) break;
                 
                     boolean foundPending = false;
@@ -575,7 +575,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             
             
                 case 9:
-                    Project activeProject9 = selectActiveProject(manager);
+                    Project activeProject9 = Project.selectActiveProject(manager, projects, scanner);
                     if (activeProject9 == null) break;
                 
                     for (Applicant a : activeProject9.getApplicantsList()) {
@@ -627,7 +627,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
                     }
                     break;
                 case 12:
-                    Project activeProject12 = selectActiveProject(manager);
+                    Project activeProject12 = Project.selectActiveProject(manager, projects, scanner);
                     if (activeProject12 == null) break;
                 
                     for (Enquiry e : activeProject12.getEnquiries()) {
@@ -687,51 +687,5 @@ private static boolean isDateOverlap(Project p1, Project p2) {
             }
         }
     }
-    
-    private static Project findProjectByNameAndManager(String name, HDBManager manager) {
-        return projects.stream()
-            .filter(p -> p.getProjectName().equalsIgnoreCase(name) && p.getManagerInCharge().equals(manager))
-            .findFirst().orElse(null);
-    }
-
-    private static Project selectActiveProject(HDBManager manager) {
-        List<Project> ownedProjects = new ArrayList<>();
-        for (Project p : projects) {
-            if (p.getManagerInCharge().equals(manager)) {
-                ownedProjects.add(p);
-            }
-        }
-    
-        if (ownedProjects.isEmpty()) {
-            System.out.println("You are not assigned to any projects.");
-            return null;
-        }
-    
-        if (ownedProjects.size() == 1) {
-            return ownedProjects.get(0); // only one to choose from
-        }
-    
-        // Show projects to select from
-        System.out.println("\nYou are assigned to multiple projects. Select one to manage:");
-        for (int i = 0; i < ownedProjects.size(); i++) {
-            System.out.println((i + 1) + ". " + ownedProjects.get(i).getProjectName() +
-                " (From " + new SimpleDateFormat("yyyy-MM-dd").format(ownedProjects.get(i).getOpeningDate()) +
-                " to " + new SimpleDateFormat("yyyy-MM-dd").format(ownedProjects.get(i).getClosingDate()) + ")");
-        }
-    
-        System.out.print("Enter number: ");
-        try {
-            int choice = Integer.parseInt(scanner.nextLine());
-            if (choice >= 1 && choice <= ownedProjects.size()) {
-                return ownedProjects.get(choice - 1);
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
-        }
-    
-        System.out.println("Invalid selection.");
-        return null;
-    }
-    
     
 }

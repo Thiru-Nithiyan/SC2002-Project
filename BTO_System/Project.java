@@ -1,6 +1,8 @@
 package BTO_System;
 
 import java.util.*;
+import java.text.SimpleDateFormat;
+
 
 public class Project {
     private String projectName;
@@ -149,6 +151,54 @@ public class Project {
         }
         return filtered;
     }
+    public static Project findProjectByNameAndManager(String name, HDBManager manager, List<Project> allProjects) {
+         return allProjects.stream()
+        .filter(p -> p.getProjectName().equalsIgnoreCase(name) && p.getManagerInCharge().equals(manager))
+        .findFirst().orElse(null);
+    }
+
+    public static Project selectActiveProject(HDBManager manager, List<Project> allProjects, Scanner scanner) {
+        List<Project> ownedProjects = new ArrayList<>();
+        for (Project p : allProjects) {
+            if (p.getManagerInCharge().equals(manager)) {
+                ownedProjects.add(p);
+            }
+        }
+
+        if (ownedProjects.isEmpty()) {
+            System.out.println("You are not assigned to any projects.");
+            return null;
+        }
+
+        if (ownedProjects.size() == 1) {
+            return ownedProjects.get(0); // only one to choose from
+        }
+
+        // Show projects to select from
+        System.out.println("\nYou are assigned to multiple projects. Select one to manage:");
+        for (int i = 0; i < ownedProjects.size(); i++) {
+            System.out.println((i + 1) + ". " + ownedProjects.get(i).getProjectName() +
+                " (From " + new SimpleDateFormat("yyyy-MM-dd").format(ownedProjects.get(i).getOpeningDate()) +
+                " to " + new SimpleDateFormat("yyyy-MM-dd").format(ownedProjects.get(i).getClosingDate()) + ")");
+        }
+
+        System.out.print("Enter number: ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine());
+            if (choice >= 1 && choice <= ownedProjects.size()) {
+                return ownedProjects.get(choice - 1);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+     }
+
+        System.out.println("Invalid selection.");
+        return null;
+    }
+
+    
+
+    
 
     
 }
