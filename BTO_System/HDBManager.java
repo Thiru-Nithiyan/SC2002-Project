@@ -3,6 +3,7 @@ import java.util.*;
 
 public class HDBManager extends User {
     private List<Project> projectsCreated;
+    private Project activeProject;
 
     public HDBManager(String nric, String password, int age, MaritalStatus maritalStatus) {
         super(nric, password, age, maritalStatus);
@@ -40,5 +41,13 @@ public class HDBManager extends User {
     public void approveWithdrawal(Application application) {
         application.updateStatus(ApplicationStatus.UNSUCCESSFUL);
         System.out.println("Withdrawal approved.");
+    }
+
+    public Project getActiveProject() {
+        return activeProject;
+    }
+    
+    public void setActiveProject(Project project) {
+        this.activeProject = project;
     }
 }

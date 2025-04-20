@@ -196,10 +196,10 @@ public class Project {
         return null;
     }
 
+    public void setManagerInCharge(HDBManager manager) {
+        this.managerInCharge = manager;
+    }
     
-
-    
-
     
 }
 
