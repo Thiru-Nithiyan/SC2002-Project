@@ -1,22 +1,40 @@
 package BTO_System;
 
-
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
-
+/**
+ * The main class for the BTO Management System.
+ * This class serves as the entry point and controller for the application,
+ * managing user interactions, authentication, and delegating to appropriate menus.
+ * 
+ * @author Your Name
+ * @version 1.0
+ */
 public class Main {
     private static List<User> users = new ArrayList<>();
     private static List<Project> projects = new ArrayList<>();
     private static List<Enquiry> enquiries = new ArrayList<>();
     private static Scanner scanner = new Scanner(System.in);
 
-private static boolean isDateOverlap(Project p1, Project p2) {
-    return !(p1.getClosingDate().before(p2.getOpeningDate()) || p1.getOpeningDate().after(p2.getClosingDate()));
-}
+    /**
+     * Checks if two projects have overlapping dates.
+     * 
+     * @param p1 The first project to compare
+     * @param p2 The second project to compare
+     * @return true if the projects' dates overlap, false otherwise
+     */
+    private static boolean isDateOverlap(Project p1, Project p2) {
+        return !(p1.getClosingDate().before(p2.getOpeningDate()) || p1.getOpeningDate().after(p2.getClosingDate()));
+    }
     
-
+    /**
+     * The main method serving as the entry point for the BTO Management System.
+     * Initializes the system, loads data, and presents the login interface.
+     * 
+     * @param args Command-line arguments (not used)
+     */
     public static void main(String[] args) {
         loadInitialData();
         System.out.println("Welcome to the BTO Management System");
@@ -41,7 +59,7 @@ private static boolean isDateOverlap(Project p1, Project p2) {
 
             System.out.println("Login successful. Welcome, " + user.getNric());
             if (user instanceof HDBManager) {
-                managerMenu((HDBManager) user); // Placeholder
+                managerMenu((HDBManager) user);
             } else if (user instanceof HDBOfficer) {
                 officerMenu((HDBOfficer) user);
             } else if (user instanceof Applicant) {
@@ -50,6 +68,10 @@ private static boolean isDateOverlap(Project p1, Project p2) {
         }
     }
 
+    /**
+     * Loads initial test data into the system.
+     * Creates sample users, managers, officers, and projects for testing purposes.
+     */
     private static void loadInitialData() {
         HDBManager jessica = new HDBManager("S5678901G", "password", 26, MaritalStatus.MARRIED);
         users.add(jessica);
@@ -84,6 +106,13 @@ private static boolean isDateOverlap(Project p1, Project p2) {
         }
     }
 
+    /**
+     * Authenticates a user based on NRIC and password.
+     * 
+     * @param nric The NRIC identifier of the user
+     * @param password The password for authentication
+     * @return The authenticated User object if successful, null otherwise
+     */
     private static User login(String nric, String password) {
         for (User user : users) {
             if (user.login(nric, password)) {
@@ -93,6 +122,12 @@ private static boolean isDateOverlap(Project p1, Project p2) {
         return null;
     }
 
+    /**
+     * Displays and handles the menu options for Applicant users.
+     * Provides functionality for viewing projects, applying, and managing applications.
+     * 
+     * @param applicant The Applicant user accessing the menu
+     */
     private static void applicantMenu(Applicant applicant) {
         while (true) {
             System.out.println("\n[Applicant Menu]");
@@ -231,6 +266,12 @@ private static boolean isDateOverlap(Project p1, Project p2) {
         }
     }
 
+    /**
+     * Displays and handles the menu options for HDB Officer users.
+     * Provides functionality for project registration, enquiry management, and applicant approvals.
+     * 
+     * @param officer The HDBOfficer user accessing the menu
+     */
     private static void officerMenu(HDBOfficer officer) {
         while (true) {
             System.out.println("\n[HDB Officer Menu]");
@@ -368,6 +409,13 @@ private static boolean isDateOverlap(Project p1, Project p2) {
         }
     }
 
+    /**
+     * Displays and handles the menu options for HDB Manager users.
+     * Provides functionality for creating, editing, and managing projects, as well as
+     * approving applications and officer registrations.
+     * 
+     * @param manager The HDBManager user accessing the menu
+     */
     private static void managerMenu(HDBManager manager) {
         Project activeProject = manager.getActiveProject(); // Load remembered project
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
